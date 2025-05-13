@@ -34,6 +34,14 @@
       font-family: 'Inter', system-ui, sans-serif;
     }
 
+    html[data-theme='light'] .menu-icon div {
+      background-color: #000;
+    }
+
+    html[data-theme='dark'] .menu-icon div {
+      background-color: #fff;
+    }
+
     body {
       display: flex;
       align-items: center;
@@ -112,10 +120,63 @@
     }
 
     .menu-icon div {
-      background-color: currentColor;
       width: 8px;
       height: 8px;
       border-radius: 1px;
+    }
+
+    .app-grid {
+      position: absolute;
+      top: 4rem;
+      left: 1em;
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 1rem;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      max-height: 80vh;
+      overflow-y: auto;
+      width: 90vw;
+      max-width: 1000px;
+      z-index: 998;
+    }
+
+    html[data-theme='dark'] .app-grid {
+      background: rgba(0, 0, 0, 0.95);
+      color: #eee;
+    }
+
+    .app-grid a {
+      text-decoration: none;
+      color: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.4rem;
+      border-radius: 6px;
+      transition: background-color 0.2s, transform 0.3s;
+      opacity: 0;
+      animation: fadeTile 0.5s ease forwards;
+    }
+
+    @keyframes fadeTile {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .icon-box {
+      font-size: 1.4rem;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.5rem;
     }
   </style>
 </head>
@@ -140,6 +201,8 @@
       loading="eager"
     >
   </div>
+
+  <div class="app-grid" id="gridMenu"></div>
 
   <script>
     const html = document.documentElement;
@@ -167,6 +230,42 @@
     toggleBtn.addEventListener('click', () => {
       const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       setTheme(newTheme);
+    });
+
+    const toggle = document.getElementById('gridToggle');
+    const menu = document.getElementById('gridMenu');
+
+    toggle.addEventListener('click', () => {
+      menu.style.display = menu.style.display === 'grid' ? 'none' : 'grid';
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!menu.contains(e.target) && !toggle.contains(e.target)) {
+        menu.style.display = 'none';
+      }
+    });
+
+    const links = [
+      { name: 'Mythology', url: 'https://abikesa.github.io/wiki-html/mythology.html', icon: '🏺' },
+      { name: 'Epistemology', url: 'https://abikesa.github.io/wiki-html/epistemology.html', icon: '🧠' },
+      { name: 'Symbolism', url: 'https://abikesa.github.io/wiki-html/symbolism.html', icon: '🧿' },
+      { name: 'Architecture', url: 'https://abikesa.github.io/wiki-html/architecture.html', icon: '🏛️' },
+      { name: 'Cognition', url: 'https://abikesa.github.io/wiki-html/cognition.html', icon: '🧬' },
+      { name: 'Resonance', url: 'https://abikesa.github.io/wiki-html/resonance.html', icon: '🎼' }
+    ];
+
+    links.forEach((link, i) => {
+      const a = document.createElement('a');
+      a.href = link.url;
+      a.target = '_blank';
+      a.style.animationDelay = `${i * 0.03}s`;
+
+      const icon = document.createElement('div');
+      icon.textContent = link.icon;
+      icon.className = 'icon-box';
+      a.appendChild(icon);
+      a.appendChild(document.createTextNode(link.name));
+      menu.appendChild(a);
     });
   </script>
 </body>
